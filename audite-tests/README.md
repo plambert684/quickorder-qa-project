@@ -26,7 +26,7 @@ Détail dans [docs/execution-report.md](docs/execution-report.md).
 |---|---|
 | Stratégie de test | [docs/test-strategy.md](docs/test-strategy.md) |
 | Matrice des risques | [docs/risk-matrix.md](docs/risk-matrix.md) |
-| Cahier de test (Excel, 24 cas) | [docs/test-cases.xlsx](docs/test-cases.xlsx) (mêmes données en CSV : [docs/test-cases-source.csv](docs/test-cases-source.csv)) |
+| Cahier de test (Excel, 24 cas) | [docs/test-cases.xlsx](docs/test-cases.xlsx)
 | Cas de test (version lisible) | [docs/test-cases.md](docs/test-cases.md) |
 | Rapport d'exécution et recommandation | [docs/execution-report.md](docs/execution-report.md) |
 | Bug reports (9) | [docs/bug-reports/](docs/bug-reports/README.md) |
