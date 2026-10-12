@@ -1,0 +1,13 @@
+TC-10 : Quantité 20 acceptée et 21 refusée par l'API
+Statut : Pass
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: quickorder-demo-key" -H "Content-Type: application/json" -d '{"items": [{"product_id": 19, "quantity": 20}]}' http://127.0.0.1:5055/api/orders | grep -oE '"(id|status|total)":[^,]*|HTTP [0-9]+'
+"id":6
+"status":"confirmed"
+"total":132.49}
+HTTP 201
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: quickorder-demo-key" -H "Content-Type: application/json" -d '{"items": [{"product_id": 19, "quantity": 21}]}' http://127.0.0.1:5055/api/orders
+{"error":"quantity must be between 1 and 20"}
+
+HTTP 400

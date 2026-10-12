@@ -1,0 +1,7 @@
+TC-08 : Coupon WELCOME10 avec un sous-total de 20,00 € (minimum exact)
+Statut : Pass
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: quickorder-demo-key" -H "Content-Type: application/json" -d '{"code": "WELCOME10", "subtotal": 20.00}' http://127.0.0.1:5055/api/coupons/validate
+{"code":"WELCOME10","discount":2.0,"discount_percent":10.0,"valid":true}
+
+HTTP 200

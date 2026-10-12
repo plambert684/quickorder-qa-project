@@ -1,0 +1,18 @@
+TC-21 : Une seule commande créée lors d'un paiement PayPal
+Statut : Fail
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -H "X-API-Key: quickorder-demo-key" http://127.0.0.1:5055/api/orders | grep -oE '"count":[0-9]+'
+"count":10
+
+(Étape interface : commande Margherita ×2 payée par PayPal, voir png/TC-21-1 et TC-21-2.)
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -H "X-API-Key: quickorder-demo-key" http://127.0.0.1:5055/api/orders | grep -oE '"count":[0-9]+'
+"count":12
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -H "X-API-Key: quickorder-demo-key" http://127.0.0.1:5055/api/orders | grep -oE '"(id|payment_method|total)":[^,]*' | head -6
+"id":12
+"payment_method":"paypal"
+"total":24.29}
+"id":11
+"payment_method":"paypal"
+"total":24.29}

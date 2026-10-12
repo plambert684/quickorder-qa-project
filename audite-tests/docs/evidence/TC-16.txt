@@ -1,0 +1,10 @@
+TC-16 : Coupon expiré EXPIRED10
+Statut : Pass
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: quickorder-demo-key" -H "Content-Type: application/json" -d '{"code": "EXPIRED10", "subtotal": 50}' http://127.0.0.1:5055/api/coupons/validate
+{"error":"Coupon invalide ou expir\u00e9.","valid":false}
+
+HTTP 404
+
+
+(Étape interface : coupon EXPIRED10 au checkout, voir png/TC-16-coupon-expire.png.)

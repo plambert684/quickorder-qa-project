@@ -1,0 +1,5 @@
+TC-14 : product_id envoyé en texte à l'API
+Statut : Fail
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -o /dev/null -w 'HTTP %{http_code} %{content_type}\n' -H "X-API-Key: quickorder-demo-key" -H "Content-Type: application/json" -d '{"items": [{"product_id": "16", "quantity": 1}]}' http://127.0.0.1:5055/api/orders
+HTTP 500 text/html; charset=utf-8

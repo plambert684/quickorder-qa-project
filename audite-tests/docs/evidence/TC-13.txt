@@ -1,0 +1,7 @@
+TC-13 : Appel de l'API sans clé
+Statut : Pass
+
+plambert@Macbook-de-Poooo quickorder-qa-project % curl -s -w '\nHTTP %{http_code}\n' http://127.0.0.1:5055/api/restaurants
+{"error":"missing or invalid X-API-Key","hint":"Use Swagger > Authorize"}
+
+HTTP 401

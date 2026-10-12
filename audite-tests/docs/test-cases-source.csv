@@ -1,0 +1,72 @@
+﻿ID;Type;Priorité;Titre;Objectif;Préconditions;Données;Étapes;Résultat attendu;Résultat obtenu;Statut;Bug lié;Preuve
+TC-01;Nominal;Haute;Connexion d'un client avec identifiants valides;Vérifier l'authentification d'un client existant.;Compte alice@example.com existant.;alice@example.com / Password123!;"1. Ouvrir /login
+2. Saisir email et mot de passe
+3. Valider";"Redirection vers l'accueil ; le nom « Alice Martin » et le lien « Déconnexion » apparaissent.";"Redirection vers l'accueil ; « Alice Martin » et « Déconnexion » s'affichent.";Pass;;"docs/evidence/png/TC-01-1-formulaire.png
+docs/evidence/png/TC-01-2-connecte.png"
+TC-02;Nominal;Haute;Ajout de produits au panier et calcul des totaux;Vérifier l'ajout au panier et le calcul sous-total / livraison / total.;Client connecté, panier vide.;"Burger Factory : Classic Burger ×2 (11,90 €), Frites maison ×1 (3,50 €) ; livraison 2,99 €";"1. Ouvrir le menu Burger Factory
+2. Ajouter Classic Burger qté 2
+3. Ajouter Frites qté 1
+4. Ouvrir /cart";"Sous-total 27,30 € ; livraison 2,99 € ; total 30,29 €.";Panier : sous-total 27,30 €, livraison 2,99 €, total 30,29 €.;Pass;;docs/evidence/png/TC-02-panier.png
+TC-03;Nominal;Haute;Commande par carte avec coupon WELCOME10;Vérifier le parcours de commande complet par carte avec un coupon valide.;"Client connecté avec adresse ; panier Burger Factory de 27,30 €.";"Coupon WELCOME10 (-10 %, min 20 €, plafond 8 €) ; paiement carte";"1. Remplir le panier (TC-02)
+2. Ouvrir /checkout
+3. Saisir WELCOME10
+4. Choisir Carte
+5. Confirmer";"Commande créée au statut confirmed, paiement paid ; réduction 2,73 € ; total 27,56 €.";Commande #2 créée : statut confirmed, paiement paid / card, réduction 2,73 €, total 27,56 €.;Pass;;"docs/evidence/png/TC-03-1-checkout.png
+docs/evidence/png/TC-03-2-commande.png"
+TC-04;Nominal;Haute;Annulation d'une commande confirmée;Vérifier qu'un client peut annuler sa commande tant qu'elle est confirmée.;"Client connecté ; une commande au statut confirmed.";Commande créée en préparation du test;"1. Passer une commande
+2. Ouvrir son détail
+3. Cliquer « Annuler la commande »";"Message « Commande annulée. » ; statut cancelled.";"Message « Commande annulée. » ; la commande #3 passe au statut cancelled.";Pass;;docs/evidence/png/TC-04-annulation.png
+TC-05;Nominal;Haute;Création d'une commande par carte via l'API;Vérifier POST /api/orders sur un cas nominal.;"Clé API valide ; compte démo alice avec adresse.";"Margherita ×2 (10,90 €) chez Pizza Roma (livraison 2,49 €, minimum 12 €) ; card";1. POST /orders avec le JSON de données;"HTTP 201 ; status confirmed ; subtotal 21,80 ; total 24,29.";"HTTP 201 ; commande #4 : status confirmed, subtotal 21,80, total 24,29.";Pass;;docs/evidence/TC-05.txt
+TC-06;Nominal;Moyenne;Paiement en espèces avec montant suffisant;Vérifier le calcul de la monnaie rendue.;Client connecté.;"Pizza Roma : Margherita ×2 = 21,80 € + 2,49 € = 24,29 € ; espèces remises 30,00 €";"1. Remplir le panier
+2. Checkout, choisir Espèces, saisir 30
+3. Confirmer";"Commande confirmée ; monnaie calculée 5,71 €.";"Commande #5 confirmée ; « Monnaie calculée : 5.71 € ».";Pass;;"docs/evidence/png/TC-06-1-checkout-especes.png
+docs/evidence/png/TC-06-2-commande.png"
+TC-07;Limite;Haute;Filtre « Livraison max ≤ 2,50 € »;Vérifier le filtre sur le frais de livraison à la valeur limite.;-;"max_delivery = 2.50 ; frais : Green Kitchen 1,99 / Pizza Roma 2,49 / autres ≥ 2,99";"1. Choisir « Livraison max ≤ 2,50 € »
+2. Rechercher";Seuls les restaurants dont la livraison est ≤ 2,50 € : Green Kitchen et Pizza Roma.;Restaurants affichés : Couscous Atlas, Tokyo Bowl, Burger Factory, Night Sushi (livraison 2,99 € à 3,49 €). Green Kitchen et Pizza Roma n'apparaissent pas.;Fail;BUG-07;docs/evidence/png/TC-07-filtre-livraison.png
+TC-08;Limite;Haute;Coupon WELCOME10 avec un sous-total de 20,00 € (minimum exact);Vérifier la borne inclusive du montant minimum du coupon.;Clé API valide.;"code WELCOME10 ; subtotal 20.00";1. POST /coupons/validate;"valid = true ; discount = 2,00.";"HTTP 200 ; valid = true, discount = 2.0.";Pass;;docs/evidence/TC-08.txt
+TC-09;Limite;Haute;Coupon WELCOME10 avec un sous-total de 19,99 € (sous le minimum);Vérifier la borne basse du coupon.;Clé API valide.;"code WELCOME10 ; subtotal 19.99";1. POST /coupons/validate;"valid = false ; message « Montant minimum non atteint. ».";"HTTP 200 ; valid = false, « Montant minimum non atteint. », minimum = 20.0.";Pass;;docs/evidence/TC-09.txt
+TC-10;Limite;Moyenne;Quantité 20 acceptée et 21 refusée par l'API;Vérifier la borne haute documentée (maximum 20).;"Clé API valide ; Tiramisu stock 100.";Tiramisu quantity = 20 puis 21;"1. POST /orders qté 20
+2. POST /orders qté 21";"qté 20 : HTTP 201 ; qté 21 : HTTP 400.";Quantité 20 : HTTP 201 (commande créée). Quantité 21 : HTTP 400 « quantity must be between 1 and 20 ».;Pass;;docs/evidence/TC-10.txt
+TC-11;Limite;Haute;Quantité demandée supérieure au stock restant;Vérifier qu'on ne peut pas commander plus que le stock disponible.;"Client connecté ; Salmon Bowl (Tokyo Bowl) stock = 2.";Salmon Bowl quantité 3;"1. Ajouter Salmon Bowl qté 3 au panier
+2. Passer commande par carte
+3. Consulter le stock (GET /api/products/{id})";"L'ajout ou la commande est refusé (stock insuffisant) ; le stock ne devient jamais négatif.";"Commande #7 confirmée et payée (total 51,19 €) ; le stock de Salmon Bowl passe de 2 à -1.";Fail;BUG-04;"docs/evidence/png/TC-11-1-ajout-quantite-3-stock-2.png
+docs/evidence/png/TC-11-2-commande.png
+docs/evidence/png/TC-11-3-stock-negatif.png
+docs/evidence/TC-11.txt"
+TC-12;Limite;Haute;Commande sous le minimum du restaurant;Vérifier que le minimum de commande affiché est appliqué.;"Client connecté ; Burger Factory minimum 20,00 €.";Classic Burger ×1 + Frites ×1 = 15,40 €;"1. Remplir le panier
+2. Checkout
+3. Confirmer par carte";Commande refusée avec un message indiquant le minimum de 20,00 €.;Le checkout affiche « Commande minimum : 20.00 € » mais la commande #8 est confirmée avec un total de 18,39 €.;Fail;BUG-06;"docs/evidence/png/TC-12-1-checkout-minimum.png
+docs/evidence/png/TC-12-2-commande.png"
+TC-13;Erreur;Haute;Appel de l'API sans clé;Vérifier que l'API est protégée.;-;Pas d'en-tête X-API-Key;1. GET /restaurants sans clé;HTTP 401 avec message d'erreur JSON.;"HTTP 401 ; « missing or invalid X-API-Key ».";Pass;;docs/evidence/TC-13.txt
+TC-14;Erreur;Moyenne;product_id envoyé en texte à l'API;Vérifier la robustesse face à un type inattendu.;Clé API valide.;"""product_id"": ""<id Margherita>"" (string)";1. POST /orders avec product_id en chaîne;HTTP 400 (validation) ou 201 (conversion), jamais d'erreur serveur 500.;HTTP 500, réponse au format text/html.;Fail;BUG-09;docs/evidence/TC-14.txt
+TC-15;Erreur;Haute;Connexion avec mauvais mot de passe;Vérifier le refus d'authentification.;Compte alice existant.;alice@example.com / mauvais;1. Se connecter avec un mauvais mot de passe;"Message « Email ou mot de passe incorrect. » ; non connecté.";"Message « Email ou mot de passe incorrect. » ; utilisateur non connecté.";Pass;;docs/evidence/png/TC-15-mauvais-mot-de-passe.png
+TC-16;Erreur;Haute;Coupon expiré EXPIRED10;Vérifier le refus d'un coupon expiré (API et UI).;Coupon EXPIRED10 expiré depuis 1 jour.;"code EXPIRED10 ; subtotal 50";"1. POST /coupons/validate
+2. Checkout UI avec EXPIRED10";"API : HTTP 404, valid=false ; UI : message « Coupon invalide ou expiré. », réduction 0.";API : HTTP 404, valid = false, « Coupon invalide ou expiré. ». Interface : même message, réduction 0,00 €.;Pass;;"docs/evidence/png/TC-16-coupon-expire.png
+docs/evidence/TC-16.txt"
+TC-17;Erreur;Haute;Accès à la commande d'un autre client;Vérifier le cloisonnement des commandes entre clients.;"Bob connecté ; commande seed #1 appartenant à Alice.";order_id de la commande d'Alice;"1. Se connecter en Bob
+2. Ouvrir /orders/<id commande Alice>";"Accès refusé (« Commande inaccessible. ») ; aucune donnée d'Alice affichée.";"Message « Commande inaccessible. » ; aucune donnée de la commande d'Alice affichée.";Pass;;docs/evidence/png/TC-17-commande-autre-client.png
+TC-18;Erreur;Moyenne;Checkout avec panier vide;Vérifier la redirection quand le panier est vide.;"Client connecté ; panier vide.";-;"1. Vider le panier
+2. Ouvrir /checkout";Redirection vers /cart avec « Votre panier est vide. ».;Redirection vers /cart avec le message « Votre panier est vide. ».;Pass;;docs/evidence/png/TC-18-panier-vide.png
+TC-19;Règle métier;Haute;Commande impossible dans un restaurant fermé;Vérifier qu'un restaurant fermé ne reçoit pas de commande.;Night Sushi is_open = false (affiché « FERMÉ »).;Late Sushi Box ×1 (14,00 €);"1. Ouvrir Night Sushi
+2. Ajouter Late Sushi Box
+3. Passer commande par carte";Ajout au panier ou commande refusé avec un message « restaurant fermé ».;Le menu affiche « FERMÉ » mais l'ajout est accepté et la commande #9 est confirmée.;Fail;BUG-03;"docs/evidence/png/TC-19-1-ajout-restaurant-ferme.png
+docs/evidence/png/TC-19-2-commande.png"
+TC-20;Règle métier;Haute;Paiement en espèces avec un montant insuffisant;Vérifier le refus d'un paiement espèces inférieur au total.;Client connecté.;"Pizza Roma : total 24,29 € ; espèces remises 1,00 €";"1. Remplir le panier
+2. Checkout, Espèces, montant 1
+3. Confirmer";Commande refusée : « montant insuffisant ».;"Commande #10 confirmée, paiement paid ; « Monnaie calculée : -23.29 € ».";Fail;BUG-02;"docs/evidence/png/TC-20-1-checkout-especes-1-euro.png
+docs/evidence/png/TC-20-2-commande.png"
+TC-21;Règle métier;Critique;Une seule commande créée lors d'un paiement PayPal;Vérifier qu'un paiement PayPal crée exactement une commande.;Client Alice connecté.;"Pizza Roma : Margherita ×2 ; paiement PayPal";"1. Compter les commandes (GET /api/orders)
+2. Commander via PayPal
+3. Recompter";"Exactement +1 commande ; un seul débit.";Nombre de commandes : 10 avant, 12 après. Deux commandes PayPal identiques à 24,29 € (#11 et #12).;Fail;BUG-01;"docs/evidence/png/TC-21-1-checkout-paypal.png
+docs/evidence/png/TC-21-2-deux-commandes.png
+docs/evidence/TC-21.txt"
+TC-22;Règle métier;Haute;Promotion ATLAS15 annoncée à -15 %;Vérifier que la réduction appliquée correspond à la promotion affichée.;Couscous Atlas affiche « utilisez le code ATLAS15 pour obtenir 15 % de réduction ».;"Couscous Royal ×2 = 35,80 € ; code ATLAS15";"1. Remplir le panier
+2. Checkout avec ATLAS15";Réduction = 15 % × 35,80 = 5,37 €.;"La page annonce « 15 % de réduction » ; réduction appliquée : 3,58 € sur 35,80 € (10 %).";Fail;BUG-08;"docs/evidence/png/TC-22-1-offre-15-pourcent.png
+docs/evidence/png/TC-22-2-reduction-appliquee.png"
+TC-23;Règle métier;Moyenne;Panier mono-restaurant;Vérifier qu'un panier ne mélange pas deux restaurants.;Panier contenant un produit Burger Factory.;Classic Burger puis Margherita;"1. Ajouter Classic Burger
+2. Ajouter Margherita";Second ajout refusé : « Un panier ne peut contenir que des produits du même restaurant. ».;"Message « Un panier ne peut contenir que des produits du même restaurant. » ; Margherita n'est pas dans le panier.";Pass;;"docs/evidence/png/TC-23-1-refus-autre-restaurant.png
+docs/evidence/png/TC-23-2-panier.png"
+TC-24;Règle métier;Haute;Adresse de livraison exigée pour un nouveau compte;Vérifier qu'une commande ne peut pas être livrée à une adresse vide.;Compte nouvellement créé (aucune adresse saisie).;Margherita ×2;"1. Créer un compte
+2. Ajouter au panier
+3. Checkout et confirmer par carte";"Le checkout exige une adresse complète ; aucune commande créée sans rue / code postal / ville.";Adresse proposée : « Domicile — , » (vide). La commande #13 est confirmée avec une adresse de livraison vide.;Fail;BUG-05;"docs/evidence/png/TC-24-1-checkout-adresse-vide.png
+docs/evidence/png/TC-24-2-commande-sans-adresse.png"
